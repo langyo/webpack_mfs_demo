@@ -1,18 +1,19 @@
 import webpack from 'webpack';
 import TerserPlugin from 'terser-webpack-plugin';
-import { resolve } from 'path';
+import { resolve, join } from 'path';
 
 import { Volume } from 'memfs';
 import { Union } from 'unionfs';
+import { link } from 'linkfs';
 import * as realFs from 'fs';
 const joinPath = require('memory-fs/lib/join');
 
 const mfs = Volume.fromJSON({
-  '/fromMem.js': 'console.log("I am from the memory fs.")'
+  [join(__dirname, './fromMem.js')]: 'console.log("I am from the memory fs.")'
 });
 const fs = new Union();
 fs.use(realFs).use(mfs);
-if (!fs.join) fs.join = joinPath;
+if (!fs.join) fs.join = join;
 
 const compiler = webpack({
   entry: resolve(__dirname, './testEntry.js'),
